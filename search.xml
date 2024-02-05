@@ -34,7 +34,7 @@
       <link href="/2024/01/27/%E9%80%86%E5%90%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
       <url>/2024/01/27/%E9%80%86%E5%90%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
       
-        <content type="html"><![CDATA[<h1 id="逆向学习笔记"><a href="#逆向学习笔记" class="headerlink" title="逆向学习笔记"></a>逆向学习笔记</h1><h2 id="手脱upx壳"><a href="#手脱upx壳" class="headerlink" title="手脱upx壳"></a>手脱upx壳</h2><p>工具准备：xdbg32，ExeinfoPE</p><p>前言：因为我们在CTF中经常会遇见upx壳，在有些题中我们无法直接通过工具进行脱壳，这时我们就需要进行手脱upx壳来进行逆向分析了。</p><p>以BUUCTF中新年快乐.exe为例(本题可以直接upx -d进行脱壳)进行说明：</p><p>首先我们ExeinfoPE看一下exe的基本信息：</p><p>![屏幕截图 2024-01-22 204616](..&#x2F;images&#x2F;屏幕截图 2024-01-22 204616.png)</p><p>发现是32位的upx壳，我们将它用xdbg32打开：</p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240122205125109.png" alt="image-20240122205125109"></p><p>F9运行到入口(可以设置入口断点方便一点:在xdbg上方”选项“中选择”选项“，里面就有入口断点的设置)：</p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240122205200197.png" alt="image-20240122205200197"></p><h6 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a><strong>第一步</strong></h6><p>首先要找到OEP去壳后的程序起点。这里常用的有三个方法：</p><p><strong>一：我们可以看有大跳转的地方：</strong></p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240122205650399.png" alt="image-20240122205650399"></p><p>我们直接看E9跳转的地址就是我们要找的OEP了，不过这个方式很多壳我们是没有办法找到的。</p><p><strong>二：根据ESP定律设置硬件断点</strong>(ESP定律：是计算机用语，意思是<strong>向堆栈中压入下一行程序的地址</strong>，其实就是会出现很多pushad)：</p><p>我们在这里设置一个断点，再F9运行就会程序断在恢复原状态的popad位置，之后我们运行过去，就可以找到OEP。</p><p><strong>三：通过内存断点找到OEP。</strong><br>内存断点是通过修改页的属性来将程序断下来。这种方法由于你修改了页的属性在壳运行的时候你会收到很多异常。需要通过调试越过这些异常最后到达OEP。</p><h6 id="第二步：dump数据"><a href="#第二步：dump数据" class="headerlink" title="第二步：dump数据"></a>第二步：dump数据</h6><p>原因：因为程序在计算机中运行时，在内存、CPU、I&#x2F;O等设备上的数据都是动态的（或者说是易失的），也就是说数据使用完或者发生异常就会丢掉。如果我想得到某些时刻的数据（有可能是调试程序Bug或者收集某些信息），就要把他转储（dump）为静态（如文件）的形式。否则，这些数据你永远都拿不到。</p><p>我们可以利用xdbg自己的插件scylla来dump数据：</p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240127003358538.png" alt="image-20240127003358538"></p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240127003442707.png" alt="image-20240127003442707"></p><p>但是dump下来的程序我们是无法正常打开的，因为我们没有修改IAT表，IAT表类似linux中的PLT表。windows的PE加载器运用动态链接的方式，将dll中的API位置填补到正确位置。然后脱壳后的程序并不是正常打开，这就导致了IAT未被正确填补需要手动或者利用工具填补IAT表。</p><p><strong>第三步：用scylla将IAT表补完。</strong></p><p>我们依次点击 IAT Autosearch, Get Imports 找到并获取导入表 右下角 Dump -&gt; Fix Dump(注意最后Fix Dump要选中之前dump出的程序。)</p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240127004921237.png" alt="image-20240127004921237"></p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240127005101715.png" alt="image-20240127005101715"></p><p>此时便脱壳完成了，操作还是比较简单的，难点在于一些题中OEP藏的很深，还需要不断的练习才能更加准确，快速的找到OEP。</p>]]></content>
+        <content type="html"><![CDATA[<h1 id="逆向学习笔记"><a href="#逆向学习笔记" class="headerlink" title="逆向学习笔记"></a>逆向学习笔记</h1><h2 id="手脱upx壳"><a href="#手脱upx壳" class="headerlink" title="手脱upx壳"></a>手脱upx壳</h2><p>工具准备：xdbg32，ExeinfoPE</p><p>前言：因为我们在CTF中经常会遇见upx壳，在有些题中我们无法直接通过工具进行脱壳，这时我们就需要进行手脱upx壳来进行逆向分析了。</p><p>以BUUCTF中新年快乐.exe为例(本题可以直接upx -d进行脱壳)进行说明：</p><p>首先我们ExeinfoPE看一下exe的基本信息：</p><p><img src="https://www.zafkielpic.cc/img/p1.png"></p><p>发现是32位的upx壳，我们将它用xdbg32打开：</p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240122205125109.png" alt="image-20240122205125109"></p><p>F9运行到入口(可以设置入口断点方便一点:在xdbg上方”选项“中选择”选项“，里面就有入口断点的设置)：</p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240122205200197.png" alt="image-20240122205200197"></p><h6 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a><strong>第一步</strong></h6><p>首先要找到OEP去壳后的程序起点。这里常用的有三个方法：</p><p><strong>一：我们可以看有大跳转的地方：</strong></p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240122205650399.png" alt="image-20240122205650399"></p><p>我们直接看E9跳转的地址就是我们要找的OEP了，不过这个方式很多壳我们是没有办法找到的。</p><p><strong>二：根据ESP定律设置硬件断点</strong>(ESP定律：是计算机用语，意思是<strong>向堆栈中压入下一行程序的地址</strong>，其实就是会出现很多pushad)：</p><p>我们在这里设置一个断点，再F9运行就会程序断在恢复原状态的popad位置，之后我们运行过去，就可以找到OEP。</p><p><strong>三：通过内存断点找到OEP。</strong><br>内存断点是通过修改页的属性来将程序断下来。这种方法由于你修改了页的属性在壳运行的时候你会收到很多异常。需要通过调试越过这些异常最后到达OEP。</p><h6 id="第二步：dump数据"><a href="#第二步：dump数据" class="headerlink" title="第二步：dump数据"></a>第二步：dump数据</h6><p>原因：因为程序在计算机中运行时，在内存、CPU、I&#x2F;O等设备上的数据都是动态的（或者说是易失的），也就是说数据使用完或者发生异常就会丢掉。如果我想得到某些时刻的数据（有可能是调试程序Bug或者收集某些信息），就要把他转储（dump）为静态（如文件）的形式。否则，这些数据你永远都拿不到。</p><p>我们可以利用xdbg自己的插件scylla来dump数据：</p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240127003358538.png" alt="image-20240127003358538"></p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240127003442707.png" alt="image-20240127003442707"></p><p>但是dump下来的程序我们是无法正常打开的，因为我们没有修改IAT表，IAT表类似linux中的PLT表。windows的PE加载器运用动态链接的方式，将dll中的API位置填补到正确位置。然后脱壳后的程序并不是正常打开，这就导致了IAT未被正确填补需要手动或者利用工具填补IAT表。</p><p><strong>第三步：用scylla将IAT表补完。</strong></p><p>我们依次点击 IAT Autosearch, Get Imports 找到并获取导入表 右下角 Dump -&gt; Fix Dump(注意最后Fix Dump要选中之前dump出的程序。)</p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240127004921237.png" alt="image-20240127004921237"></p><p><img src="/.com//Users\Zafkiel\AppData\Roaming\Typora\typora-user-images\image-20240127005101715.png" alt="image-20240127005101715"></p><p>此时便脱壳完成了，操作还是比较简单的，难点在于一些题中OEP藏的很深，还需要不断的练习才能更加准确，快速的找到OEP。</p>]]></content>
       
       
       
@@ -49,17 +49,6 @@
       <title>友链</title>
       <link href="/link/index.html"/>
       <url>/link/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>电影</title>
-      <link href="/movies/index.html"/>
-      <url>/movies/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -90,6 +79,28 @@
     
     
     <entry>
+      <title>电影</title>
+      <link href="/movies/index.html"/>
+      <url>/movies/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>tags</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>音乐</title>
       <link href="/music/index.html"/>
       <url>/music/index.html</url>
@@ -106,17 +117,6 @@
       <url>/images/pic_bed/README.html</url>
       
         <content type="html"><![CDATA[<h1 id="pic-bed"><a href="#pic-bed" class="headerlink" title="pic_bed"></a>pic_bed</h1><p>图床</p>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>tags</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
