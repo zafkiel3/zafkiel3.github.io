@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>春秋杯2023冬 复现</title>
+      <link href="/2024/02/05/%E6%98%A5%E7%A7%8B%E6%9D%AF2023%E5%86%AC%20%E5%A4%8D%E7%8E%B0/"/>
+      <url>/2024/02/05/%E6%98%A5%E7%A7%8B%E6%9D%AF2023%E5%86%AC%20%E5%A4%8D%E7%8E%B0/</url>
+      
+        <content type="html"><![CDATA[<h1 id="春秋杯2023冬-复现"><a href="#春秋杯2023冬-复现" class="headerlink" title="春秋杯2023冬 复现"></a>春秋杯2023冬 复现</h1><h3 id="upx2023"><a href="#upx2023" class="headerlink" title="upx2023"></a>upx2023</h3><p>首先发现无法直接upx -d的命令脱壳，再仔细看，发现是修改了upx的特征码，将UPX0等改为了upx0导致命令脱壳失败，所以我们首先要在010中将特征码修改回来(UPX的特征码是55 50 58），都修改后就可以直接upx -d脱壳了，然后我们拖进IDA分析:</p><p>发现是一个rand—seed的一个形式，还有一个change函数但是代码有点复杂，看不太懂，所以我们动态调试看一下，放一个测试字符串康康：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flag&#123;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&#125;</span><br></pre></td></tr></table></figure><p>得到：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">f&#123;37BFJNRVZlg02468ACEGIKMOQSUWY&#125;a159DHLPTX</span><br></pre></td></tr></table></figure><p>发现change函数大概只是将flag的顺序换了一下，没有修改值，所以关键就来到如何找到seed，然后逆向异或出顺序换了的flag，所以我们直接爆破seed，来找到时间戳：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">#include&lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">int seed, i, key, r;</span><br><span class="line">for(seed = 1672473600;seed &lt; 1704009600; seed++)</span><br><span class="line">&#123;</span><br><span class="line">srand(seed);</span><br><span class="line">r = 1;</span><br><span class="line">for (i = 0;i &lt; 33; i++)</span><br><span class="line">&#123;</span><br><span class="line">key = rand() % 255;</span><br><span class="line">switch (i)</span><br><span class="line">&#123;</span><br><span class="line">case 0:</span><br><span class="line">if (key != (&#x27;f&#x27; ^ 0x09))</span><br><span class="line">&#123;</span><br><span class="line">r = 0;</span><br><span class="line">&#125;</span><br><span class="line">break;</span><br><span class="line">case 11:</span><br><span class="line">if (key != (&#x27;l&#x27; ^ 0xC6))</span><br><span class="line">&#123;</span><br><span class="line">r = 0;</span><br><span class="line">&#125;</span><br><span class="line">break;</span><br><span class="line">case 32:</span><br><span class="line">if (key != (&#x27;a&#x27; ^ 0xFA))</span><br><span class="line">&#123;</span><br><span class="line">r = 0;</span><br><span class="line">&#125;</span><br><span class="line">break;</span><br><span class="line">case 12:</span><br><span class="line">if (key != (&#x27;g&#x27; ^ 0x65))</span><br><span class="line">&#123;</span><br><span class="line">r = 0;</span><br><span class="line">&#125;</span><br><span class="line">break;</span><br><span class="line">case 1:</span><br><span class="line">if (key != (&#x27;&#123;&#x27; ^ 0x63))</span><br><span class="line">&#123;</span><br><span class="line">r = 0;</span><br><span class="line">&#125;</span><br><span class="line">break;</span><br><span class="line">default:</span><br><span class="line">break;</span><br><span class="line">&#125;</span><br><span class="line">if (r == 0)</span><br><span class="line">&#123;</span><br><span class="line">break;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">if (r == 1)</span><br><span class="line">&#123;</span><br><span class="line">printf(&quot;%u\n&quot;, seed); // seed = 1682145110</span><br><span class="line">break;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int data[] = &#123; 0x09, 0x63, 0xD9, 0xF6, 0x58, 0xDD, 0x3F, 0x4C, 0x0F, 0x0B, 0x98, 0xC6, 0x65, 0x21, 0x41, 0xED, 0xC4, 0x0B, 0x3A, 0x7B, 0xE5, 0x75, 0x5D, 0xA9, 0x31, 0x41, 0xD7, 0x52, 0x6C, 0x0A, 0xFA, 0xFD, 0xFA, 0x84, 0xDB, 0x89, 0xCD, 0x7E, 0x27, 0x85, 0x13, 0x08 &#125;;</span><br><span class="line">srand(seed);</span><br><span class="line"></span><br><span class="line">for (i = 0; i &lt; 42; i++)</span><br><span class="line">&#123;</span><br><span class="line">printf(&quot;%c&quot;, ((rand() % 255) ^ data[i]) &amp; 0xff);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">return 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure><p>爆破出的结果：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">seed = 1682145110</span><br><span class="line">f&#123;52bgb-281lg00ff-46f7-ca009c8e&#125;a381-b7191</span><br></pre></td></tr></table></figure><p>那么我们找到了顺序调换后的flag，再在python中用字符串索引得到真正的flag：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">example1 = &#x27;flag&#123;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&#125;&#x27;</span><br><span class="line">example2 = &#x27;f&#123;37BFJNRVZlg02468ACEGIKMOQSUWY&#125;a159DHLPTX&#x27;</span><br><span class="line">flag1 = &#x27;f&#123;52bgb-281lg00ff-46f7-ca009c8e&#125;a381-b7191&#x27;</span><br><span class="line"></span><br><span class="line">for i in example1:</span><br><span class="line">    print(flag1[example2.index(i)],end = &quot;&quot;)</span><br></pre></td></tr></table></figure><p>flag：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flag&#123;0305f8f2-14b6-fg7b-bc7a-010299c881e1&#125;</span><br></pre></td></tr></table></figure><p>总结：这个题当时是因为没有注意到upx的特征码被修改，所以去手脱upx，dump数据后发现出错了，思路被打乱了没有解出来，不过这个题也告诉了我upx加密特征码修改这个知识点，最后的脚本部分还是比较清晰的。</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>re基础知识（复习）</title>
       <link href="/2024/01/27/re%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86(%E5%A4%8D%E4%B9%A0)/"/>
       <url>/2024/01/27/re%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86(%E5%A4%8D%E4%B9%A0)/</url>
@@ -33,39 +46,6 @@
     
     
     <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>友链</title>
       <link href="/link/index.html"/>
       <url>/link/index.html</url>
@@ -88,9 +68,31 @@
     
     
     <entry>
-      <title>tags</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 页脚与头图透明 */#footer {    background: transparent !important;  }  #page-header {    background: transparent !important;  }    /* 白天模式遮罩透明 */  #footer::before {    background: transparent !important;  }  #page-header::before {    background: transparent !important;  }    /* 夜间模式遮罩透明 */  [data-theme="dark"] #footer::before {    background: transparent !important;  }  [data-theme="dark"] #page-header::before {    background: transparent !important;  }]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -104,6 +106,17 @@
       <url>/images/pic_bed/README.html</url>
       
         <content type="html"><![CDATA[<h1 id="pic-bed"><a href="#pic-bed" class="headerlink" title="pic_bed"></a>pic_bed</h1><p>图床</p>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>tags</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
