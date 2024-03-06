@@ -1,0 +1,203 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Zafkiel的博客小屋 | Zafkiel的博客小屋</title><meta name="author" content="Zafkiel"><meta name="copyright" content="Zafkiel"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="第一部分打开题目，先找main函数，点进第一个函数中（此时只有几十行代码）发现有不少地方爆红（看网上一些大佬的wp没有讲到这一个，应该是简单没有提），在爆红的地方按TAB进入反汇编窗口，用d + c小连招解决爆红，然后发现代码有400行（QAQ），那只能慢慢分析了。 第二部分发现下面的代码，在大约360行附近的if ( v45 &#x3D;&#x3D; “combase.dll” )语句处有一个突">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zafkiel的博客小屋">
+<meta property="og:url" content="https://www.zafkiel3.com/2024/03/06/SICTF%20closeme/index.html">
+<meta property="og:site_name" content="Zafkiel的博客小屋">
+<meta property="og:description" content="第一部分打开题目，先找main函数，点进第一个函数中（此时只有几十行代码）发现有不少地方爆红（看网上一些大佬的wp没有讲到这一个，应该是简单没有提），在爆红的地方按TAB进入反汇编窗口，用d + c小连招解决爆红，然后发现代码有400行（QAQ），那只能慢慢分析了。 第二部分发现下面的代码，在大约360行附近的if ( v45 &#x3D;&#x3D; “combase.dll” )语句处有一个突">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2024-03-06T04:01:33.472Z">
+<meta property="article:modified_time" content="2024-03-06T03:59:57.914Z">
+<meta property="article:author" content="Zafkiel">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://www.zafkiel3.com/2024/03/06/SICTF%20closeme/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.12.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Zafkiel的博客小屋',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-03-06 11:59:57'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Zafkiel的博客小屋"><span class="site-name">Zafkiel的博客小屋</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">无题</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-03-06T04:01:33.472Z" title="发表于 2024-03-06 12:01:33">2024-03-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-06T03:59:57.914Z" title="更新于 2024-03-06 11:59:57">2024-03-06</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h4 id="第一部分"><a href="#第一部分" class="headerlink" title="第一部分"></a>第一部分</h4><p>打开题目，先找main函数，点进第一个函数中（此时只有几十行代码）发现有不少地方爆红（看网上一些大佬的wp没有讲到这一个，应该是简单没有提），在爆红的地方按TAB进入反汇编窗口，用d + c小连招解决爆红，然后发现代码有400行（QAQ），那只能慢慢分析了。</p>
+<h4 id="第二部分"><a href="#第二部分" class="headerlink" title="第二部分"></a>第二部分</h4><p>发现下面的代码，在大约360行附近的if ( v45 &#x3D;&#x3D; “combase.dll” )语句处有一个突兀的异或，分析一下发现这是一个hint，解出来：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">data = [0x23, 0x11, 0x0D, 0x1B, 0x13, 0x4B, 0x18, 0x04, 0x03, 0x0A, 0x50, 0x08, 0x1D, 0x06, 0x54, 0x16, 0x1A, 0x18, 0x0B, 0x1C, 0x5A, 0x0F, 0x14, 0x18, 0x5E, 0x12, 0xE5, 0xF2, 0xF1, 0xE2, 0xE3, 0xE0, 0xE4, 0xE8, 0xF0, 0xA9, 0xE8, 0xF2, 0xAC, 0xEE, 0xE2, 0xE6, 0xF3, 0xFA, 0xB2, 0xF3, 0xCD, 0xF0, 0xE5, 0xF7, 0xB8, 0xF6, 0xE8, 0xBB, 0xFC, 0xD3, 0xF1, 0xFF, 0x8C, 0x81, 0xCB, 0xD7, 0x84, 0xD2, 0xCF, 0xCB, 0xC4, 0x89, 0xC8, 0xCE, 0x8C, 0xDE, 0xDA, 0xC0, 0xC2, 0xD4, 0xD6, 0x9D, 0x94, 0xFF, 0xC3, 0xC4, 0xCC, 0x99, 0xD9, 0xD3, 0xD3, 0xD2, 0xCD, 0xDA, 0xE0, 0x98, 0xA7, 0xB0, 0xEB, 0x8B, 0xA9, 0xEF, 0xF9, 0xE6, 0xFA, 0xE2, 0xEC, 0xA4, 0xA0, 0xEF, 0xB1, 0xF1, 0xB1, 0xB6, 0xA6, 0xA1, 0xB7, 0xBE, 0xB6, 0xF9, 0xB5, 0xA9, 0xB8, 0xB8, 0xAC, 0xFF, 0x97, 0x89, 0x8B, 0x80, 0x8C, 0xC5, 0x8F, 0x94, 0xC8, 0x9D, 0x82, 0x8E, 0xCC, 0x8B, 0x82, 0x8E, 0x97, 0xDD, 0xD2, 0x80, 0x81, 0x96, 0x9E, 0xD7, 0x99, 0x8A, 0xDA, 0xCB, 0xCD, 0xCD, 0xCE, 0xCE, 0x31, 0x31, 0x32, 0x2D, 0x24, 0x55, 0x6A, 0x62, 0x69, 0x7A, 0x6F, 0x2B, 0x7F, 0x78, 0x6C, 0x62, 0x79, 0x65, 0x32, 0x75, 0x78, 0x74, 0x71, 0x37, 0x6F, 0x71, 0x73, 0x78, 0x74, 0x3D, 0x6A, 0x77, 0x45, 0x01, 0x44, 0x4C, 0x56, 0x48, 0x47, 0x53, 0x08, 0x45, 0x43, 0x40, 0x49, 0x0D, 0x4E, 0x7C, 0x79, 0x72, 0x66, 0x75, 0x4F, 0x05, 0x07, 0x07, 0x08, 0x08, 0x0B, 0x0B, 0x0C, 0x40, 0x5E]</span><br><span class="line">hint = &quot;&quot;</span><br><span class="line">for i in range(len(data)):</span><br><span class="line">    hint += &quot;&quot;.join(chr(data[i] ^ (i + 102) &amp; 0xff)) #注意0xff防止溢出导致ascll码转化出奇奇怪怪的东西</span><br><span class="line">print(hint)</span><br><span class="line"></span><br><span class="line">#Every time you close the messagebox by click `Yes` or `No`, it will be stored. Just choose Yes/No(1/0) in a certain order which is the flag, such as 01001100. Please submit flag which the format like `SICTF&#123;01001100&#125;`</span><br></pre></td></tr></table></figure>
+
+<p>根据提示我们发现，这是一个根据我们点击是或否来进行加密的，结合hint我们再分析一下代码，在180行代码附近有两个if的嵌套判断，查官网MessageBoxw函数的介绍，我们知道它的返回值6和7是点击是和点击否，所以我们可以判断出我们点击是时为1，点击否时为0，且我们需要点击16次是&#x2F;否，大致如下。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">v23 = MessageBoxW(0i64, p10, lpCaption[1], 4u);</span><br><span class="line">    if ( lpCaption[0] )</span><br><span class="line">      sub_7FF66EE838E0(p11, 2 * (__int64)lpCaption[0], 2i64);</span><br><span class="line">    if ( v73 )</span><br><span class="line">      sub_7FF66EE838E0((__int64)p10, 2 * v73, 2i64);</span><br><span class="line">    v24 = 1;</span><br><span class="line">    if ( v23 != 6 )   / 点击否 </span><br><span class="line">    &#123;</span><br><span class="line">      if ( v23 != 7 )  /点击是</span><br><span class="line">      &#123;</span><br><span class="line">        v66 = (const WCHAR *)&amp;off_7FF66EEA2B98;</span><br><span class="line">        v67 = 1i64;</span><br><span class="line">        Size = (size_t)&amp;off_7FF66EEA2888;</span><br><span class="line">        v69 = 0i64;</span><br><span class="line">        sub_7FF66EEA14A0((__int64)&amp;v66, (__int64)&amp;off_7FF66EEA2BA8);</span><br><span class="line">      &#125;</span><br><span class="line">      v24 = 0;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="第三部分"><a href="#第三部分" class="headerlink" title="第三部分"></a>第三部分</h4><p>在根据题目给我们动态调试的提示，我们开始通过动态调试来找到更多的线索。在205处下断点，我们可以调试发现（要点击完16下是否），196行代码处v63存储着我们输入的1&#x2F;0记录（注意要按几下d键修正地址偏移）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if ( v64 == v62 )</span><br><span class="line">        &#123;</span><br><span class="line">          sub_7FF72F013820(&amp;v62);</span><br><span class="line">          v25 = v64;</span><br><span class="line">        &#125;</span><br><span class="line">        *(_BYTE *)(v63 + v25) = v24;</span><br><span class="line">        if ( ++v64 == 16 )</span><br><span class="line">          break;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">debug050:000002EAF2CDD660 unk_2EAF2CDD660 db    1                 ; DATA XREF: Stack[0000058C]:000000FED7FEF988↑o</span><br><span class="line">debug050:000002EAF2CDD661 db    1</span><br><span class="line">debug050:000002EAF2CDD662 db    0</span><br><span class="line">debug050:000002EAF2CDD663 db    1</span><br><span class="line">debug050:000002EAF2CDD664 db    0</span><br><span class="line">debug050:000002EAF2CDD665 db    1</span><br><span class="line">debug050:000002EAF2CDD666 db    0</span><br><span class="line">debug050:000002EAF2CDD667 db    1</span><br><span class="line">debug050:000002EAF2CDD668 db    0</span><br><span class="line">debug050:000002EAF2CDD669 db    1</span><br><span class="line">debug050:000002EAF2CDD66A db    0</span><br><span class="line">debug050:000002EAF2CDD66B db    1</span><br><span class="line">debug050:000002EAF2CDD66C db    0</span><br><span class="line">debug050:000002EAF2CDD66D db    1</span><br><span class="line">debug050:000002EAF2CDD66E db    0</span><br><span class="line">debug050:000002EAF2CDD66F db    1</span><br></pre></td></tr></table></figure>
+
+<p>我们再在269行代码处下断点，可以明显发现LABEL_4下的十几行代码都是记录我们输入1&#x2F;0的顺序，并将它们存放在p0~p15中，这里我们可以发现p0最先被输入却在个位，而p15最后被输入却在最高位，所以我们可以发现这里将我们的输入的1&#x2F;0顺序给倒序了一下（重点）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">result = p0</span><br><span class="line">         + 10</span><br><span class="line">         * (p1</span><br><span class="line">          + 10</span><br><span class="line">          * (p2</span><br><span class="line">           + 10</span><br><span class="line">           * (p3</span><br><span class="line">            + 10</span><br><span class="line">            * (p4</span><br><span class="line">             + 10</span><br><span class="line">             * (p5</span><br><span class="line">              + 10</span><br><span class="line">              * (p6</span><br><span class="line">               + 10</span><br><span class="line">               * (p7</span><br><span class="line">                + 10</span><br><span class="line">                * (p8 + 10 * (p9 + 10i64 * (_QWORD)&amp;p10[50000 * p15 + 5000 * p14 + 500 * p13 + 50 * p12 + 5 * p11])))))))));</span><br></pre></td></tr></table></figure>
+
+<p>而且这里是在将我们输入的01转换成一个十进制的数。</p>
+<h4 id="第四部分（个人能力问题，这部分猜的占比很大）"><a href="#第四部分（个人能力问题，这部分猜的占比很大）" class="headerlink" title="第四部分（个人能力问题，这部分猜的占比很大）"></a>第四部分（个人能力问题，这部分猜的占比很大）</h4><p>在350行LABEL_3上面有一个if判断：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">if ( (v44 &amp; 0xFFFF0000) != -1443823616 )</span><br><span class="line">  &#123;</span><br><span class="line">LABEL_3:</span><br><span class="line">    v64 = 0i64;</span><br><span class="line">    goto LABEL_4;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们可以根据上面的p0~p15如果输入不正确就会跳转这里猜出这里应该是最终我们要比较的地方，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">v44 = 0xA9F10000(-1443823616)</span><br><span class="line">#拿一下v44的值0xA9F1</span><br></pre></td></tr></table></figure>
+
+<p>然后我们看一下v44的二进制形式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1010 1001 1111 0001</span><br></pre></td></tr></table></figure>
+
+<p>然后我们就可以进行下一轮的调试（在上面哪个v44的if语句处下断点），输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">        输入             v44         二进制输出   </span><br><span class="line">1111 1111 0000 0000 -&gt; 0xff00 -&gt; 0000 0000 1111 1111</span><br><span class="line"></span><br><span class="line">0000 0000 1111 1111 -&gt; 0x3FC0 -&gt; 0011 1111 1100 0000</span><br><span class="line"></span><br><span class="line">1010 1001 1111 0001 -&gt; 0x63E5 -&gt; 0110 0011 1110 0101</span><br><span class="line"></span><br><span class="line">1001 1001 1001 1001 -&gt; 0x6666 -&gt; 0110 0110 0110 0110</span><br><span class="line"></span><br><span class="line">1011 0011 1000 1010 -&gt; 0x3473 -&gt; 0011 0100 0111 0011</span><br></pre></td></tr></table></figure>
+
+<p>然后我们开始找规律：看第一组数据，我们发现加密部分应该是有一个倒序（我们上面分析的哪个），看第二个像是倒序后将末尾两位移到最前面，即：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">        输入                    倒序                   移位</span><br><span class="line">0000 0000 1111 1111 -&gt; 1111 1111 0000 0000 -&gt; 0011 1111 1100 0000</span><br></pre></td></tr></table></figure>
+
+<p>如果是这样那么我们第一个就不只是倒序应该是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1111 1111 0000 0000 -&gt;(0000 0000) 1111 1111 -&gt; (0000 0000) 1111 1111(此时末尾的11移到了最前面，但是先移位了，在补零)</span><br></pre></td></tr></table></figure>
+
+<p>我们可以在输入几个验证一下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">        输入                    倒序                   移位   </span><br><span class="line">1010 1001 1111 0001 -&gt; 1000 1111 1001 0101 -&gt; 0110 0011 1110 0101</span><br><span class="line"></span><br><span class="line">1001 1001 1001 1001 -&gt; 1001 1001 1001 1001 -&gt; 0110 0110 0110 0110</span><br><span class="line"></span><br><span class="line">1011 0011 1000 1010 -&gt; (0)101 0001 1100 1101 -&gt; 0110 1000 1110 011(此时位数不足16位，左边补零) -&gt;</span><br><span class="line">0011 0100 0111 0011</span><br></pre></td></tr></table></figure>
+
+<p>完美匹配，所以我们找到了加密的方法，就可以对v44逆向找出flag了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">v44 = 0xA9F1 (1010 1001 1111 0001)</span><br><span class="line"></span><br><span class="line">        v44                    移位                   倒序</span><br><span class="line">1010 1001 1111 0001 -&gt; 1010 0111 1100 0110 -&gt; 0110 0011 1110 0101</span><br></pre></td></tr></table></figure>
+
+<p>所以flag就是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SICTF&#123;0110001111100101&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="第五部分（大佬的做法）"><a href="#第五部分（大佬的做法）" class="headerlink" title="第五部分（大佬的做法）"></a>第五部分（大佬的做法）</h4><p>直接读代码，写脚本（膜拜一下QWQ）</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://www.zafkiel3.com">Zafkiel</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://www.zafkiel3.com/2024/03/06/SICTF%20closeme/">https://www.zafkiel3.com/2024/03/06/SICTF%20closeme/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://www.zafkiel3.com" target="_blank">Zafkiel的博客小屋</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2024/02/05/%E6%98%A5%E7%A7%8B%E6%9D%AF2023%E5%86%AC%20%E5%A4%8D%E7%8E%B0/" title="春秋杯2023冬 复现"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">春秋杯2023冬 复现</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Zafkiel</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86"><span class="toc-number">1.</span> <span class="toc-text">第一部分</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86"><span class="toc-number">2.</span> <span class="toc-text">第二部分</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86"><span class="toc-number">3.</span> <span class="toc-text">第三部分</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%88%E4%B8%AA%E4%BA%BA%E8%83%BD%E5%8A%9B%E9%97%AE%E9%A2%98%EF%BC%8C%E8%BF%99%E9%83%A8%E5%88%86%E7%8C%9C%E7%9A%84%E5%8D%A0%E6%AF%94%E5%BE%88%E5%A4%A7%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">第四部分（个人能力问题，这部分猜的占比很大）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E9%83%A8%E5%88%86%EF%BC%88%E5%A4%A7%E4%BD%AC%E7%9A%84%E5%81%9A%E6%B3%95%EF%BC%89"><span class="toc-number">5.</span> <span class="toc-text">第五部分（大佬的做法）</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/03/06/SICTF%20closeme/" title="无题">无题</a><time datetime="2024-03-06T04:01:33.472Z" title="发表于 2024-03-06 12:01:33">2024-03-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/05/%E6%98%A5%E7%A7%8B%E6%9D%AF2023%E5%86%AC%20%E5%A4%8D%E7%8E%B0/" title="春秋杯2023冬 复现">春秋杯2023冬 复现</a><time datetime="2024-02-05T10:57:57.853Z" title="发表于 2024-02-05 18:57:57">2024-02-05</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/01/27/re%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86(%E5%A4%8D%E4%B9%A0)/" title="re基础知识（复习）">re基础知识（复习）</a><time datetime="2024-01-27T15:54:01.752Z" title="发表于 2024-01-27 23:54:01">2024-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/01/27/%E9%80%86%E5%90%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="初步认识手脱upx壳">初步认识手脱upx壳</a><time datetime="2024-01-26T16:55:02.800Z" title="发表于 2024-01-27 00:55:02">2024-01-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Zafkiel</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.12.0"></script><script src="/js/main.js?v=4.12.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body></html>
