@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>羊城杯 Ez加密器</title>
+      <link href="/2024/03/14/%E7%BE%8A%E5%9F%8E%E6%9D%AF%20%20Ez%E5%8A%A0%E5%AF%86%E5%99%A8/"/>
+      <url>/2024/03/14/%E7%BE%8A%E5%9F%8E%E6%9D%AF%20%20Ez%E5%8A%A0%E5%AF%86%E5%99%A8/</url>
+      
+        <content type="html"><![CDATA[<h3 id="羊城杯-Ez加密器"><a href="#羊城杯-Ez加密器" class="headerlink" title="羊城杯 Ez加密器"></a>羊城杯 Ez加密器</h3><h4 id="第一部分"><a href="#第一部分" class="headerlink" title="第一部分"></a>第一部分</h4><p>通过查找字符串找到主函数：</p><p><img src="https://www.zafkielpic.cc/img/p29.png"></p><p>看到这里有四个函数，我们一一分析，第一个函数没有看出有什么的特别，我们看第二个：第二个信息量就很大了，首先可以看到两个提示输入，那么下面的两个应该是接受输入的的函数了。</p><p><img src="https://www.zafkielpic.cc/img/p30.png"></p><p>这里sub_140003A20这个函数看的不是很懂，先放一下，后面的sub_140003910这个函数和前面的sub_140003A20函数结构很像，我们动态调试一下这两个函数，动态调试时发现fun1（sub_140003A20）这个函数是验证我们的验证码是否正确，同时这里的fun1他限制了验证码是6位的数字，点进fun1里的a1可以发现：</p><p><img src="https://www.zafkielpic.cc/img/p31.png"></p><p>这里也可以看到这里的两个数据的长度分别是6和40，a000000存储着我们的验证码，那么上面就存储着我们的flag，调试看看：</p><p><img src="https://www.zafkielpic.cc/img/p36.png"></p><p>猜测正确。其实这里也可以把fun1的前半段代码复制下来爆破出验证码的长度，因为fun1中只有len（a1）为6时才能让v3</p><p>为1</p><p><img src="https://www.zafkielpic.cc/img/p32.png"></p><p>后半部分的代码时验证输入的是不是字符串，同样可以爆破，动态调试试，当然也可以GPT（大人，时代变了@w@）</p><h4 id="第二部分"><a href="#第二部分" class="headerlink" title="第二部分"></a>第二部分</h4><p>分析完第二个函数，我们看看后面两个：第三个是base64变表加密，第四个是一个DES加密可以用IDA的Signsrch插件查出。</p><p>最后的比较部分如果我们直接看Str1：</p><p><img src="https://www.zafkielpic.cc/img/p33.png"></p><p>如果直接那这里的data去逆向，就会出错，这里的几个‘’&gt;‘和”?“字符串很可疑，所以我们在动态调试一下看看这里的data是不是被改变了：</p><p><img src="https://www.zafkielpic.cc/img/p34.png"></p><p>果然，是被更改了，这里我们可以查找这个字符串的引用找到加密的部分：</p><p><img src="https://www.zafkielpic.cc/img/p35.png"></p><p>其实这里就在DES加密的函数里面。</p><h4 id="第三部分"><a href="#第三部分" class="headerlink" title="第三部分"></a>第三部分</h4><p>信息基本齐全了，EXP：</p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">from pyDes import *</span><br><span class="line">from Crypto.Cipher import DES</span><br><span class="line">import base64</span><br><span class="line"></span><br><span class="line">data = &quot;0723105D5C12217DCDC3601F5ECB54DA9CCEC2279F1684A13A0D716D17217F4C9EA85FF1A42795731CA3C55D3A4D7BEA&quot;</span><br><span class="line">#用于将一个十六进制表示的字符串转换为字节串</span><br><span class="line">encrypt_data = bytes.fromhex(data)</span><br><span class="line"></span><br><span class="line">def decrypt_DES(key , encrypt_data):</span><br><span class="line">    cipher = DES.new(key,DES.MODE_ECB)</span><br><span class="line">    decrypt_data = cipher.decrypt(encrypt_data)</span><br><span class="line">    return decrypt_data</span><br><span class="line"></span><br><span class="line">str1 = &quot;abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ+/&quot;</span><br><span class="line">str2 = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;</span><br><span class="line"></span><br><span class="line">#string = str.maketrans(str1,str2) </span><br><span class="line">string = str.maketrans(str2,str1)</span><br><span class="line"></span><br><span class="line">for i in range(1000000):</span><br><span class="line">    key = base64.b64encode(str(i).rjust(6,&quot;0&quot;).encode()).decode().translate(string).encode()</span><br><span class="line">    decrypt_data =  decrypt_DES(key,encrypt_data)</span><br><span class="line">    if(b&#x27;DASCTF&#123;&#x27; in decrypt_data):</span><br><span class="line">        print(decrypt_data)</span><br><span class="line">        exit()</span><br><span class="line">        </span><br><span class="line">#DASCTF&#123;f771b96b71514bb6bc20f3275fa9404e&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>NSSCTF vm_wo</title>
       <link href="/2024/03/11/NSSCTF%20vm_wo/"/>
       <url>/2024/03/11/NSSCTF%20vm_wo/</url>
@@ -98,9 +111,9 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title>友链</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -131,9 +144,9 @@
     
     
     <entry>
-      <title>友链</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -154,10 +167,10 @@
     
     <entry>
       <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
+      <link href="/images/pic_bed/README.html"/>
+      <url>/images/pic_bed/README.html</url>
       
-        <content type="html"><![CDATA[/* 页脚与头图透明 */#footer {    background: transparent !important;  }  #page-header {    background: transparent !important;  }    /* 白天模式遮罩透明 */  #footer::before {    background: transparent !important;  }  #page-header::before {    background: transparent !important;  }    /* 夜间模式遮罩透明 */  [data-theme="dark"] #footer::before {    background: transparent !important;  }  [data-theme="dark"] #page-header::before {    background: transparent !important;  }]]></content>
+        <content type="html"><![CDATA[<h1 id="pic-bed"><a href="#pic-bed" class="headerlink" title="pic_bed"></a>pic_bed</h1><p>图床</p>]]></content>
       
     </entry>
     
@@ -165,10 +178,10 @@
     
     <entry>
       <title></title>
-      <link href="/images/pic_bed/README.html"/>
-      <url>/images/pic_bed/README.html</url>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
       
-        <content type="html"><![CDATA[<h1 id="pic-bed"><a href="#pic-bed" class="headerlink" title="pic_bed"></a>pic_bed</h1><p>图床</p>]]></content>
+        <content type="html"><![CDATA[/* 页脚与头图透明 */#footer {    background: transparent !important;  }  #page-header {    background: transparent !important;  }    /* 白天模式遮罩透明 */  #footer::before {    background: transparent !important;  }  #page-header::before {    background: transparent !important;  }    /* 夜间模式遮罩透明 */  [data-theme="dark"] #footer::before {    background: transparent !important;  }  [data-theme="dark"] #page-header::before {    background: transparent !important;  }]]></content>
       
     </entry>
     
